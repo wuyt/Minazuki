@@ -2,38 +2,40 @@ using UnityEngine;
 
 namespace Minazuki
 {
-    public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
+    /// <summary>
+    /// 单实例
+    /// </summary>
+    /// <typeparam name="T">类型</typeparam>
+    public class Singleton<T> : MonoBehaviour where T : Singleton<T>
     {
-        private static T instance;
+        /// <summary>
+        /// 实例
+        /// </summary>
+        private static T _instance;
+        /// <summary>
+        /// 实例
+        /// </summary>
         public static T Instance
         {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = FindObjectOfType(typeof(T)) as T;
-                    if (instance == null)
-                    {
-                        Debug.LogError("There needs to be one active " + typeof(T).ToString() + " script on a GameObject in your scene.");
-                    }
-                }
-                return instance;
-            }
+            get { return _instance; }
         }
-
-        protected void Awake()
+        protected virtual void Awake()
         {
-            if (instance == null)
+            if (_instance == null)
             {
-                instance = this as T;
-                DontDestroyOnLoad(this.gameObject);
+                _instance = this as T;
+                DontDestroyOnLoad(gameObject);
             }
             else
             {
-                Destroy(this.gameObject);
+                Destroy(gameObject);
             }
+        }
+
+        protected virtual void OnDestroy()
+        {
+            if (_instance == this) { _instance = null; }
         }
     }
 }
-
 
